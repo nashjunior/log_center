@@ -1,5 +1,7 @@
 package com.log_centter.demo.services.implementations;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,11 +37,11 @@ public class LogInterfaceImpl implements LogInterface {
     List<?> list = new ArrayList<>();
 
     for (Map.Entry<String, Object> param : params.entrySet()) {
-      if (param.getValue() instanceof Date) {
-        sqlSearch = sqlSearch.concat("date(" + param.getValue().toString() + ")=to_date('" + param.getValue().toString()
+      if (params.containsKey("date") && isValidDate(param.getValue().toString())) {
+        sqlSearch = sqlSearch.concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString()
             + "','DD-MM-YYYY') AND ");
       } else {
-        sqlSearch = sqlSearch.concat(param.getValue().toString() + "='" + param.getValue().toString() + "' AND ");
+        sqlSearch = sqlSearch.concat(param.getKey() + "='" + param.getValue().toString() + "' AND ");
       }
     }
 
@@ -63,6 +65,17 @@ public class LogInterfaceImpl implements LogInterface {
   @Override
   public Log createLog(Log log) {
     return logRepo.save(log);
+  }
+
+  public static Boolean isValidDate(final String inDate) {
+    final SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
+    dateFormat2.setLenient(false);
+    try {
+      dateFormat2.parse(inDate.trim());
+      return true;
+    } catch (final ParseException pe) {
+      return false;
+    }
   }
 
 }

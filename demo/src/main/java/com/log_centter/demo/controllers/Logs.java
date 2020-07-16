@@ -2,9 +2,7 @@ package com.log_centter.demo.controllers;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +13,6 @@ import javax.validation.Valid;
 import com.log_centter.demo.entities.Log;
 import com.log_centter.demo.services.interfaces.LogInterface;
 
-import java.lang.reflect.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,20 +34,14 @@ public class Logs {
   private ResponseEntity<List<?>> getAllLogs(@RequestParam final Map<String, Object> reqParam) {
     reqParam.entrySet()
         .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
-            .filter(field -> field.getName().equals(param.getValue().toString())).collect(Collectors.toList())
-            .isEmpty() == true && (param.getKey().equals("date") && isValidDate(param.getValue().toString())));
-    if (reqParam.size() > 0) {
-      Optional<Object> date = (Optional<Object>) reqParam.get("date");
-      try {
-        reqParam.put("date", new SimpleDateFormat("dd/MM/yyyy").parse(reqParam.get(date).toString()));
-        final List<?> logs = logInterface.findAllLogsByParam(reqParam);
-        if (logs.size() > 0) {
-          return ResponseEntity.ok(logs);
-        }
-      } catch (ParseException e) {
-        return ResponseEntity.badRequest().build();
-      }
+        .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() ==true);
+    System.out.println(reqParam.size());
 
+    if (reqParam.size() > 0) {
+      final List<?> logs = logInterface.findAllLogsByParam(reqParam);
+      if (logs.size() > 0) {
+        return ResponseEntity.ok(logs);
+      }
     }
     return ResponseEntity.ok(logInterface.findAllLogs());
   }
@@ -66,16 +57,5 @@ public class Logs {
     }
 
     return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(savedLog);
-  }
-
-  public static Boolean isValidDate(final String inDate) {
-    final SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
-    dateFormat2.setLenient(false);
-    try {
-      dateFormat2.parse(inDate.trim());
-      return true;
-    } catch (final ParseException pe) {
-      return false;
-    }
   }
 }
