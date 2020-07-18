@@ -3,7 +3,6 @@ package com.log_centter.demo.services.implementations;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +45,6 @@ public class LogInterfaceImpl implements LogInterface {
     }
 
     sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
-    System.out.println(sqlSearch);
     Query query = em.createNativeQuery(sqlSearch, Log.class);
     try {
       list = query.getResultList();
@@ -54,7 +52,6 @@ public class LogInterfaceImpl implements LogInterface {
       System.out.println(e.getMessage());
     }
     return list;
-
   }
 
   @Override

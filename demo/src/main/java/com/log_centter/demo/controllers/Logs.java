@@ -1,11 +1,8 @@
 package com.log_centter.demo.controllers;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -34,8 +31,7 @@ public class Logs {
   private ResponseEntity<List<?>> getAllLogs(@RequestParam final Map<String, Object> reqParam) {
     reqParam.entrySet()
         .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
-        .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() ==true);
-    System.out.println(reqParam.size());
+            .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true);
 
     if (reqParam.size() > 0) {
       final List<?> logs = logInterface.findAllLogsByParam(reqParam);
@@ -43,6 +39,7 @@ public class Logs {
         return ResponseEntity.ok(logs);
       }
     }
+    
     return ResponseEntity.ok(logInterface.findAllLogs());
   }
 

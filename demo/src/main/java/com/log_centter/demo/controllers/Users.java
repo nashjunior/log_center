@@ -14,18 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class Users {
+
   @Autowired
   private UserRepo userRepo;
 
-  /* private BCryptPasswordEncoder bCryptPasswordEncoder;
+  /*
+   * private BCryptPasswordEncoder bCryptPasswordEncoder;
+   * 
+   * public Users(UserRepo userRepo, BCryptPasswordEncoder bCryptPasswordEncoder){
+   * this.bCryptPasswordEncoder=bCryptPasswordEncoder; this.userRepo=userRepo; }
+   */
 
-  public Users(UserRepo userRepo, BCryptPasswordEncoder bCryptPasswordEncoder){
-    this.bCryptPasswordEncoder=bCryptPasswordEncoder;
-    this.userRepo=userRepo;
-  } */
-
-  @GetMapping ("/login")
-  public User login(@Valid @RequestBody User user){
+  @GetMapping("/login")
+  public User login(@Valid @RequestBody User user) {
     return userRepo.findByEmail(user.getEmail());
   }
 
