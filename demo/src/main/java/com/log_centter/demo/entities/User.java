@@ -11,17 +11,12 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import lombok.AllArgsConstructor;
+
 @Entity
 @Table(name = "users")
+@AllArgsConstructor
 public class User {
-
-  public User() {
-	}
-
-	public User(String email, String password) {
-		this.email = email;
-		this.password = password;
-	}
 
   @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +30,19 @@ public class User {
 
 	@NotBlank
   @Column
-  private String password;
+	private String password;
+	
+	@NotBlank
+	@Column
+	private Boolean admin;
+
+	public Boolean getAdmin() {
+		return this.admin;
+	}
+
+	public void setAdmin(Boolean admin) {
+		this.admin = admin;
+	}
 
   private String token;
 

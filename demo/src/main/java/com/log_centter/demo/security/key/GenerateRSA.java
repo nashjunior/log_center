@@ -3,6 +3,7 @@ package com.log_centter.demo.security.key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
 
@@ -16,6 +17,11 @@ import org.springframework.stereotype.Component;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class GenerateRSA {
   private String encodedPublicKey;
+  private PrivateKey privateKey;
+
+  public PrivateKey getPrivateKey() {
+    return this.privateKey;
+  }
 
   public String getEncodedPublicKey() {
     return this.encodedPublicKey;
@@ -27,7 +33,7 @@ public class GenerateRSA {
 
 		KeyPair kp = keyGenerator.genKeyPair();
     PublicKey publicKey = (PublicKey) kp.getPublic();
+    this.privateKey = (PrivateKey) kp.getPrivate();
     this.encodedPublicKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
-		
   }
 }
