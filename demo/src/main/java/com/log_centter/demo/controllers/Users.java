@@ -62,7 +62,6 @@ public class Users {
 
   @PostMapping("/signup")
   public ResponseEntity<User> createUse(@Valid @RequestBody UserDTORequest user) {
-    System.out.println("entrou aqui");
     if (!userRepo.findByEmail(user.getEmail()).isEmpty()) {
       return ResponseEntity.badRequest().build();
     }
