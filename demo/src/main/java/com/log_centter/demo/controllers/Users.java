@@ -42,7 +42,7 @@ public class Users {
   private JwtUtils jwtUtils;
 
   @GetMapping("/login")
-  public ResponseEntity<?> login(@Valid @RequestBody UserDTORequest user) throws NoSuchAlgorithmException {
+  private ResponseEntity<?> login(@Valid @RequestBody UserDTORequest user) throws NoSuchAlgorithmException {
     Optional<User> login = userRepo.findByEmail(user.getEmail());
     if (!login.isPresent()) {
       return ResponseEntity.badRequest().build();
@@ -58,7 +58,7 @@ public class Users {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<User> createUse(@Valid @RequestBody UserDTORequest user) {
+  private ResponseEntity<User> createUse(@Valid @RequestBody UserDTORequest user) {
     if (userRepo.findByEmail(user.getEmail()).isPresent()) {
       return ResponseEntity.badRequest().build();
     }
