@@ -54,7 +54,7 @@ public class SecurityRestWeb extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(authEntryPoint).and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-        .antMatchers("/api/auth/**").permitAll().and().authorizeRequests().antMatchers("/api/test/**").permitAll()
+        .antMatchers("/api/auth/**").permitAll().and().authorizeRequests().antMatchers("/api/logs/**").permitAll()
         .anyRequest().authenticated();
 
     httpSecurity.addFilterBefore(newfilterAuthEntryPoint(), UsernamePasswordAuthenticationFilter.class);

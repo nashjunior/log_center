@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/logs")
 public class Logs {
 
   @Autowired
@@ -35,8 +35,8 @@ public class Logs {
   @Autowired
   JwtUtils jwtIUtils;
 
-  @GetMapping("/logs")
-  @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('ADMIN')")
+  @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
   private ResponseEntity<List<?>> getAllLogs(@RequestParam final Map<String, Object> reqParam)
       throws NoSuchAlgorithmException {
     reqParam.entrySet()
@@ -49,12 +49,12 @@ public class Logs {
         return ResponseEntity.ok(logs);
       }
     }
-    this.jwtIUtils.getEncodedPublicKey();
     return ResponseEntity.ok(logInterface.findAllLogs());
   }
 
-  @PostMapping("/logs")
+  @PostMapping
   @ResponseBody
+  @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
   private ResponseEntity<Log> createLog(@Valid @RequestBody final Log newLog) {
     Log savedLog;
     try {

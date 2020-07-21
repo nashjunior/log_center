@@ -7,6 +7,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import com.log_centter.demo.security.authentication.user_details.UserDetailsImpl;
 
@@ -47,22 +48,24 @@ public class JwtUtils {
   @SuppressWarnings("deprecation")
   public String generateJwtToken(Authentication authentication) throws NoSuchAlgorithmException {
     this.generateRsa();
+    System.out.println(this.encodedPublicKey);
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
     String token = Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
         .setExpiration(new Date(new Date().getTime() + jwtExpirationTime))
-        .claim("groups", userPrincipal.getAuthorities()).signWith(SignatureAlgorithm.RS256, this.privateKey).compact();
-    System.out.println("Token: " + token);
+        .claim("groups", userPrincipal.getAuthorities().stream().map(authority -> authority.getAuthority())
+        .collect(Collectors.toList())).signWith(SignatureAlgorithm.RS256, this.privateKey).compact();
     return token;
   }
 
   public String getUserNameFromJwtToken(String token) {
-    return Jwts.parser().setSigningKey(this.encodedPublicKey).parseClaimsJws(token).getBody().getSubject();
+    return Jwts.parser().setSigningKey(this.publicKey).parseClaimsJws(token).getBody().getSubject();
   }
 
   @SuppressWarnings("deprecation")
   public boolean validateJwtToken(String authToken) {
     try {
-      Jwts.parser().setSigningKey(this.encodedPublicKey).parseClaimsJws(authToken);
+      Jwts.parser().setSigningKey(this.publicKey).parseClaimsJws(authToken);
+      System.out.println("senha ok");
       return true;
     } catch (SignatureException e) {
       logger.error("Invalid JWT signature: {}", e.getMessage());
