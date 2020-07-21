@@ -1,6 +1,6 @@
 package com.log_centter.demo.controllers;
 
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import com.log_centter.demo.entities.Log;
+import com.log_centter.demo.repos.LogRepo;
 import com.log_centter.demo.security.authentication.jwt.JwtUtils;
 import com.log_centter.demo.services.interfaces.LogInterface;
 
@@ -37,25 +38,24 @@ public class Logs {
 
   @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
-  private ResponseEntity<List<?>> getAllLogs(@RequestParam final Map<String, Object> reqParam)
-      throws NoSuchAlgorithmException {
+  public ResponseEntity<List<?>> getAllLogs(@RequestParam Map<String, Object> reqParam){
     reqParam.entrySet()
         .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
             .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true);
 
-    if (reqParam.size() > 0) {
+    /* if (reqParam.size() > 0) {
       final List<?> logs = logInterface.findAllLogsByParam(reqParam);
       if (logs.size() > 0) {
         return ResponseEntity.ok(logs);
       }
-    }
+    } */
     return ResponseEntity.ok(logInterface.findAllLogs());
   }
 
   @PostMapping
   @ResponseBody
   @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-  private ResponseEntity<Log> createLog(@Valid @RequestBody final Log newLog) {
+  public ResponseEntity<Log> createLog(@Valid @RequestBody final Log newLog) {
     Log savedLog;
     try {
       savedLog = logInterface.createLog(newLog);

@@ -48,7 +48,6 @@ public class JwtUtils {
   @SuppressWarnings("deprecation")
   public String generateJwtToken(Authentication authentication) throws NoSuchAlgorithmException {
     this.generateRsa();
-    System.out.println(this.encodedPublicKey);
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
     String token = Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
         .setExpiration(new Date(new Date().getTime() + jwtExpirationTime))
@@ -65,7 +64,6 @@ public class JwtUtils {
   public boolean validateJwtToken(String authToken) {
     try {
       Jwts.parser().setSigningKey(this.publicKey).parseClaimsJws(authToken);
-      System.out.println("senha ok");
       return true;
     } catch (SignatureException e) {
       logger.error("Invalid JWT signature: {}", e.getMessage());
