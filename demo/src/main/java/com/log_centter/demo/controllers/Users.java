@@ -43,13 +43,10 @@ public class Users {
 
   @GetMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody UserDTORequest user) throws NoSuchAlgorithmException {
-    this.jwtUtils.getPrivateKey();
-    this.jwtUtils.getEncodedPublicKey();
     Optional<User> login = userRepo.findByEmail(user.getEmail());
     if (!login.isPresent()) {
       return ResponseEntity.badRequest().build();
     }
-
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
 
@@ -62,9 +59,10 @@ public class Users {
 
   @PostMapping("/signup")
   public ResponseEntity<User> createUse(@Valid @RequestBody UserDTORequest user) {
-    if (!userRepo.findByEmail(user.getEmail()).isEmpty()) {
+    if (userRepo.findByEmail(user.getEmail()).isPresent()) {
       return ResponseEntity.badRequest().build();
     }
+    user.setPassword(encoder.encode(user.getPassword()));
     User newUser = userRepo.save(user.buildUser());
     return newUser == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(newUser);
   }

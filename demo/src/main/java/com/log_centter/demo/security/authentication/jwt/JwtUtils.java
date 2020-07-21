@@ -50,7 +50,7 @@ public class JwtUtils {
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
     String token = Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
         .setExpiration(new Date(new Date().getTime() + jwtExpirationTime))
-        .claim("groups", userPrincipal.getAuthorities()).signWith(SignatureAlgorithm.HS512, this.privateKey).compact();
+        .claim("groups", userPrincipal.getAuthorities()).signWith(SignatureAlgorithm.RS256, this.privateKey).compact();
     System.out.println("Token: " + token);
     return token;
   }
@@ -83,7 +83,7 @@ public class JwtUtils {
     KeyPair kp;
     if (this.publicKey == null && this.privateKey == null) {
       KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-      keyGenerator.initialize(1024);
+      keyGenerator.initialize(2048);
 
       kp = keyGenerator.genKeyPair();
       this.publicKey = (PublicKey) kp.getPublic();

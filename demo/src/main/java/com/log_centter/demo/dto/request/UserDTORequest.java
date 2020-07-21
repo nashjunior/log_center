@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserDTORequest {
+  
   @NotBlank
   private String email;
   @NotBlank
