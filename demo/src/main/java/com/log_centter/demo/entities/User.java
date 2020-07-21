@@ -1,6 +1,5 @@
 package com.log_centter.demo.entities;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,28 +11,30 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class User {
 
-  @Id
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@NotBlank
 	@Size(max = 50)
-  @Email
-  @Column
+	@Email
+	@Column
 	private String email;
 
 	@NotBlank
-  @Column
+	@Column
 	private String password;
-	
+
 	@NotBlank
 	@Column
 	private Boolean admin;
@@ -46,24 +47,13 @@ public class User {
 		this.admin = admin;
 	}
 
-  private String token;
-
-  public String getToken() {
-    return this.token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
-
-  public Long getId() {
+	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 
 	public String getEmail() {
 		return email;
@@ -80,6 +70,5 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-  
 
 }
