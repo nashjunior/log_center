@@ -12,10 +12,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
   @Id

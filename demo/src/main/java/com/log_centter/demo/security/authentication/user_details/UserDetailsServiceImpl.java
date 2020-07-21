@@ -4,12 +4,12 @@ import com.log_centter.demo.entities.User;
 import com.log_centter.demo.repos.UserRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
+/* import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException; */
 import org.springframework.transaction.annotation.Transactional;
 
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl{}/* implements UserDetailsService {
 
   @Autowired
   UserRepo userRepo;
@@ -22,4 +22,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     return UserDetailsImpl.build(user);
   }
   
-}
+} */

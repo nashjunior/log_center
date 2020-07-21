@@ -1,5 +1,6 @@
 package com.log_centter.demo.controllers;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import com.log_centter.demo.entities.Log;
+import com.log_centter.demo.security.authentication.jwt.JwtUtils;
 import com.log_centter.demo.services.interfaces.LogInterface;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,12 @@ public class Logs {
   @Autowired
   LogInterface logInterface;
 
+  @Autowired
+  JwtUtils jwtIUtils;
+
   @GetMapping("/logs")
-  private ResponseEntity<List<?>> getAllLogs(@RequestParam final Map<String, Object> reqParam) {
+  private ResponseEntity<List<?>> getAllLogs(@RequestParam final Map<String, Object> reqParam)
+      throws NoSuchAlgorithmException {
     reqParam.entrySet()
         .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
             .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true);
@@ -39,7 +45,7 @@ public class Logs {
         return ResponseEntity.ok(logs);
       }
     }
-    
+    this.jwtIUtils.getEncodedPublicKey();
     return ResponseEntity.ok(logInterface.findAllLogs());
   }
 

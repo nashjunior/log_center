@@ -31,7 +31,7 @@ public class LogInterfaceImpl implements LogInterface {
   private LogRepo logRepo;
 
   @Override
-  public List<?> findAllLogsByParam(Map<String, Object> params) {
+  public List<?> findAllLogsByParam( Map<String, Object> params) {
     String sqlSearch = "SELECT l.* from Log l where ";
     List<?> list = new ArrayList<>();
 
@@ -51,6 +51,7 @@ public class LogInterfaceImpl implements LogInterface {
     } catch (RuntimeException e) {
       System.out.println(e.getMessage());
     }
+
     return list;
   }
 
