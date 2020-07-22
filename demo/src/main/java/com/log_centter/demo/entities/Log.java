@@ -15,8 +15,13 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Log {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY) 

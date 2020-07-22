@@ -1,6 +1,5 @@
 package com.log_centter.demo.security.authentication.user_details;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -14,23 +13,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 public class UserDetailsImpl implements UserDetails {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private Long id;
 
-	private String email;
+  private String email;
 
-	@JsonIgnore
+  @JsonIgnore
   private String password;
-  
+
   private Collection<? extends GrantedAuthority> authorities;
 
   public UserDetailsImpl(Long id2, String email2, String password2, List<GrantedAuthority> authorities2) {
@@ -41,11 +34,11 @@ public class UserDetailsImpl implements UserDetails {
   }
 
   public static UserDetailsImpl build(User user) {
-    String [] roles = user.getAdmin() == true? new String []{"USER", "ADMIN"} : new String[] {"USER"};
+    String[] roles = user.getAdmin() == true ? new String[] { "USER", "ADMIN" } : new String[] { "USER" };
 
-    List <GrantedAuthority> authorities = Arrays.asList(roles).stream().
-      map(role-> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
-    
+    List<GrantedAuthority> authorities = Arrays.asList(roles).stream().map(role -> new SimpleGrantedAuthority(role))
+        .collect(Collectors.toList());
+
     return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword(), authorities);
   }
 
@@ -95,5 +88,5 @@ public class UserDetailsImpl implements UserDetails {
     UserDetailsImpl user = (UserDetailsImpl) obj;
     return Objects.equals(id, user.id);
   }
-  
+
 }
