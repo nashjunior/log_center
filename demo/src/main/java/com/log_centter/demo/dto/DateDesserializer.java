@@ -3,24 +3,20 @@ package com.log_centter.demo.dto;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class DateDesserializer extends StdDeserializer<Date> {
   private static final long serialVersionUID = 1L;
 
-  private static final String[] DATE_FORMATS = new String[] { "dd/MM/yyyy HH:mm:ss", "dd/MM/yyyy" };
+  private static final String[] DATE_FORMATS = new String[] { "dd/MM/yyyy-HH:mm:ss", "dd/MM/yyyy" };
 
   public DateDesserializer() {
     this(null);
@@ -37,8 +33,11 @@ public class DateDesserializer extends StdDeserializer<Date> {
 
     for (String DATE_FORMAT : DATE_FORMATS) {
       try {
-        return new SimpleDateFormat(DATE_FORMAT).parse(date);
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        dateFormat.setLenient(false);
+        return dateFormat.parse(date.trim());
       } catch (ParseException e) {
+        System.out.println(e.getMessage());
       }
     }
     throw new JsonParseException(jp,

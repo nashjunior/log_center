@@ -1,7 +1,5 @@
 package com.log_centter.demo.controllers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.log_centter.demo.dto.request.LogsDTORequest;
@@ -67,15 +64,18 @@ public class Logs {
   @PostMapping
   @ResponseBody
   @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-  public ResponseEntity<Log> createLog(@Valid @RequestBody final Log newLog) {
-    Log savedLog;
+  public ResponseEntity<Log> createLog(@Valid @RequestBody final LogsDTORequest newLog) {
+    Log log = new Log();
     try {
-      savedLog = logInterface.save(newLog);
+      
+      objectMapper.updateValue(log, newLog);
+      System.out.println(log.getOrigin());
+      logInterface.save(log);
     } catch (final Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(savedLog);
+    return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(log);
   }
 
   @PutMapping("/{id}")
