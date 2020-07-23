@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -31,14 +32,14 @@ public class LogInterfaceImpl implements LogInterface {
   private LogRepo logRepo;
 
   @Override
-  public List<?> findAllLogsByParam( Map<String, Object> params) {
+  public List<?> findAllLogsByParam(Map<String, Object> params) {
     String sqlSearch = "SELECT l.* from Log l where ";
     List<?> list = new ArrayList<>();
 
     for (Map.Entry<String, Object> param : params.entrySet()) {
       if (params.containsKey("date") && isValidDate(param.getValue().toString())) {
-        sqlSearch = sqlSearch.concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString()
-            + "','DD-MM-YYYY') AND ");
+        sqlSearch = sqlSearch
+            .concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString() + "','DD-MM-YYYY') AND ");
       } else {
         sqlSearch = sqlSearch.concat(param.getKey() + "='" + param.getValue().toString() + "' AND ");
       }
@@ -56,12 +57,12 @@ public class LogInterfaceImpl implements LogInterface {
   }
 
   @Override
-  public List<Log> findAllLogs() {
+  public List<Log> findAll() {
     return logRepo.findAll();
   }
 
   @Override
-  public Log createLog(Log log) {
+  public Log save(Log log) {
     return logRepo.save(log);
   }
 
@@ -74,6 +75,20 @@ public class LogInterfaceImpl implements LogInterface {
     } catch (final ParseException pe) {
       return false;
     }
+  }
+
+  @Override
+  public Optional<Log> findById(Long id) {
+    return logRepo.findById(id);
+  }
+
+  public Boolean deleteById(Long id) {
+    try {
+      logRepo.deleteById(id);
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
   }
 
 }
