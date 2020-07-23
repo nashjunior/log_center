@@ -14,17 +14,18 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.log_centter.demo.dto.DateDesserializer;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 public class Log {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY) 
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   public Long getId() {
@@ -74,16 +75,8 @@ public class Log {
 
   @Temporal(TemporalType.TIMESTAMP)
   @NotNull
-  @JsonFormat(pattern="dd/MM/yyyy HH:mm:ss", timezone = JsonFormat.DEFAULT_TIMEZONE, locale = JsonFormat.DEFAULT_LOCALE )
+  @JsonDeserialize(using = DateDesserializer.class)
   private Date date;
-
-  public Date getDate() {
-    return this.date;
-  }
-
-  public void setDate(Date date) {
-    this.date = date;
-  }
 
   @Column
   @NotNull
@@ -97,5 +90,5 @@ public class Log {
   public void setQuantity(Long quantity) {
     this.quantity = quantity;
   }
-  
+
 }

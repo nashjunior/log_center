@@ -1,7 +1,11 @@
 package com.log_centter.demo.dto.request;
 
 import java.util.Date;
+import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.log_centter.demo.dto.DateDesserializer;
 import com.log_centter.demo.entities.LogLevel;
 
 import lombok.AllArgsConstructor;
@@ -12,10 +16,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogsDTORequest {
-  private Long id;
-  private LogLevel logLevel;
-  private String eventDescription;
-  private String origin;
-  private Date date;
-  private Long quantity;
+  private Optional<Long> id;
+  private Optional<LogLevel> logLevel;
+  private Optional<String> eventDescription;
+  private Optional<String> origin;
+  @JsonDeserialize(using = DateDesserializer.class)
+  private Optional<Date> date;
+  private Optional<Long> quantity;
 }

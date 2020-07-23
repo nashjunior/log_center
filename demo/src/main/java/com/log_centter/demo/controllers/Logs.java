@@ -1,6 +1,7 @@
 package com.log_centter.demo.controllers;
 
-import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.log_centter.demo.dto.request.LogsDTORequest;
@@ -78,14 +80,17 @@ public class Logs {
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-  public ResponseEntity<LogsDTORequest> updateLog(@PathVariable("id") Long id,@Valid @RequestBody LogsDTORequest logUpdated) {
+  public ResponseEntity<LogsDTORequest> updateLog(@PathVariable("id") Long id,
+      @Valid @RequestBody LogsDTORequest logUpdated) {
 
     Optional<Log> log = logInterface.findById(id);
     if (!log.isPresent()) {
       return ResponseEntity.notFound().build();
     }
     try {
-    } catch (IllegalArgumentException e) {
+      objectMapper.updateValue(log.get(), logUpdated);
+      logInterface.save(log.get());
+    } catch (IllegalArgumentException | JsonMappingException e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
