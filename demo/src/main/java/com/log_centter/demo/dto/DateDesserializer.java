@@ -1,46 +1,37 @@
 package com.log_centter.demo.dto;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 
-public class DateDesserializer extends StdDeserializer<Date> {
-  private static final long serialVersionUID = 1L;
-
-  private static final String[] DATE_FORMATS = new String[] { "dd/MM/yyyy-HH:mm:ss", "dd/MM/yyyy" };
-
-  public DateDesserializer() {
-    this(null);
-  }
-
-  public DateDesserializer(Class<?> vc) {
-    super(vc);
-  }
+public class DateDesserializer extends JsonDeserializer<LocalDateTime> {
+  private static final String[] DATE_FORMATS = new String[] { "dd/MM/yyyy HH:mm:ss", "dd/MM/yyyy" };
 
   @Override
-  public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-    JsonNode node = jp.getCodec().readTree(jp);
-    final String date = node.textValue();
+  public LocalDateTime deserialize(JsonParser paramJsonParser, DeserializationContext paramDeserializationContext)
+      throws IOException, JsonProcessingException {
+    if (paramJsonParser == null || "".equals(paramJsonParser.getText()))
+      return null;
+    String date = paramJsonParser.getText();
 
-    for (String DATE_FORMAT : DATE_FORMATS) {
+    for (String format : DATE_FORMATS) {
+      System.out.println(format);
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
       try {
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        dateFormat.setLenient(false);
-        return dateFormat.parse(date.trim());
-      } catch (ParseException e) {
-        System.out.println(e.getMessage());
+        LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
+        return dateTime;
+      } catch (Exception e) {
+        // TODO: handle exception
       }
     }
-    throw new JsonParseException(jp,
+    throw new JsonParseException(paramJsonParser,
         "Unparseable date: \"" + date + "\". Supported formats: " + Arrays.toString(DATE_FORMATS));
   }
 }

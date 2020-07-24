@@ -1,6 +1,6 @@
 package com.log_centter.demo.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,15 +9,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.log_centter.demo.dto.DateDesserializer;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,10 +41,9 @@ public class Log {
   private String origin;
 
   @NotNull
-  @JsonProperty("date")
   @JsonDeserialize(using = DateDesserializer.class)
   @Column(nullable = false)
-  private Date date;
+  private LocalDateTime date;
 
   @NotNull
   @GeneratedValue(strategy = GenerationType.IDENTITY)

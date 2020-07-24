@@ -37,15 +37,29 @@ public class LogInterfaceImpl implements LogInterface {
     List<?> list = new ArrayList<>();
 
     for (Map.Entry<String, Object> param : params.entrySet()) {
-      if (params.containsKey("date") && isValidDate(param.getValue().toString())) {
+      if (param.getKey().equals("date") && isValidDate(param.getValue().toString())) {
         sqlSearch = sqlSearch
             .concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString() + "','DD-MM-YYYY') AND ");
-      } else {
+      } else if (!param.getKey().equals("page") && !param.getKey().equals("size")) {
         sqlSearch = sqlSearch.concat(param.getKey() + "='" + param.getValue().toString() + "' AND ");
+      } else if (param.getKey().equals("page") && params.containsKey("size")) {
+        try {
+          Integer.parseInt(param.getValue().toString());
+          sqlSearch = sqlSearch.concat("OFFSET " + Integer.valueOf(param.getValue().toString()) + " ");
+        } catch (NumberFormatException | NullPointerException e) {
+        }
+      } else {
+        try {
+          Integer.parseInt(param.getValue().toString());
+          sqlSearch = sqlSearch.concat("LIMIT " + Integer.valueOf(param.getValue().toString()) + " ");
+        } catch (NumberFormatException | NullPointerException e) {
+        }
       }
     }
-
-    sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
+    if (!params.containsKey("size")) {
+      sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
+    }
+    System.out.println(sqlSearch);
     Query query = em.createNativeQuery(sqlSearch, Log.class);
     try {
       list = query.getResultList();
