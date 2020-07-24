@@ -1,16 +1,16 @@
 ----------------------------------------------------------------
-Sun Jul 05 13:23:53 GFT 2020:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0173-1fca-857b-00002b9524e8 
-on database directory memory:D:\projetos\cursos\codenation\error_center\demo\c04aa6e0-12b1-49fa-9698-17cf1b975fb6 with class loader sun.misc.Launcher$AppClassLoader@4e0e2f2a 
-Loaded from file:/C:/Users/Nash%20Junior/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
-java.vendor=AdoptOpenJDK
-java.runtime.version=1.8.0_252-b09
-user.dir=D:\projetos\cursos\codenation\error_center\demo
-os.name=Windows 10
+Thu Jul 23 08:47:35 BRT 2020:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0173-7b80-09a9-0000023e7350 
+on database directory memory:/home/desenvolvimento/Documentos/projetos/cursos/codenation/log_center/demo/59efbcb2-8e0f-4743-8e92-4ad2844f3087 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@55054057 
+Loaded from file:/home/desenvolvimento/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
+java.vendor=Ubuntu
+java.runtime.version=11.0.7+10-post-Ubuntu-3ubuntu1
+user.dir=/home/desenvolvimento/Documentos/projetos/cursos/codenation/log_center/demo
+os.name=Linux
 os.arch=amd64
-os.version=10.0
+os.version=5.4.0-42-generic
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Sun Jul 05 13:23:54 GFT 2020:
-Shutting down instance a816c00e-0173-1fca-857b-00002b9524e8 on database directory memory:D:\projetos\cursos\codenation\error_center\demo\c04aa6e0-12b1-49fa-9698-17cf1b975fb6 with class loader sun.misc.Launcher$AppClassLoader@4e0e2f2a 
+Thu Jul 23 08:47:37 BRT 2020:
+Shutting down instance a816c00e-0173-7b80-09a9-0000023e7350 on database directory memory:/home/desenvolvimento/Documentos/projetos/cursos/codenation/log_center/demo/59efbcb2-8e0f-4743-8e92-4ad2844f3087 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@55054057 

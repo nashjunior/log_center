@@ -3,8 +3,12 @@ package com.log_centter.demo.services.implementations;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -31,20 +35,51 @@ public class LogInterfaceImpl implements LogInterface {
   private LogRepo logRepo;
 
   @Override
-  public List<?> findAllLogsByParam( Map<String, Object> params) {
+  public List<?> findAllLogsByParam(Map<String, Object> params) {
     String sqlSearch = "SELECT l.* from Log l where ";
     List<?> list = new ArrayList<>();
+    List<Map.Entry<String, Object>> list2= new ArrayList<>(params.entrySet());
+    
+    //Comparando as chaves e colocando o size como ultima chave
+    Collections.sort(list2, (obj1, obj2) -> {
+      if(!obj1.getKey().equals("size") && !obj1.getKey().equals("page")) return -1;
+      else if(obj1.getKey().equals("size") || obj2.getKey().equals("page")) return 1;
+
+      return 0;
+    });
+    params.clear();
+    list2.forEach(obj -> params.put(obj.getKey(), obj.getValue()));
 
     for (Map.Entry<String, Object> param : params.entrySet()) {
-      if (params.containsKey("date") && isValidDate(param.getValue().toString())) {
-        sqlSearch = sqlSearch.concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString()
-            + "','DD-MM-YYYY') AND ");
-      } else {
+      //verifica se parametro e tipo date
+      if (param.getKey().equals("date") && isValidDate(param.getValue().toString())) {
+        sqlSearch = sqlSearch
+            .concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString() + "','DD/MM/YYYY') AND ");
+      }
+      //verifica se o parametro não e de paginacao 
+      else if (!param.getKey().equals("page") && !param.getKey().equals("size")) {
         sqlSearch = sqlSearch.concat(param.getKey() + "='" + param.getValue().toString() + "' AND ");
+      } else if (param.getKey().equals("page") && params.containsKey("size")) {
+        sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
+        try {
+          Integer.parseInt(param.getValue().toString());
+          sqlSearch = sqlSearch.concat("OFFSET " + Integer.valueOf(param.getValue().toString()) + " ");
+        } catch (NumberFormatException | NullPointerException e) {
+          return null;
+        }
+      } else {
+        try {
+          Integer.parseInt(param.getValue().toString());
+          sqlSearch = sqlSearch.concat("LIMIT " + Integer.valueOf(param.getValue().toString()) + " ");
+        } catch (NumberFormatException | NullPointerException e) {
+          return null;
+        }
       }
     }
-
-    sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
+    if (!params.containsKey("size")) {
+      sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
+    }
+    System.out.println(sqlSearch);
     Query query = em.createNativeQuery(sqlSearch, Log.class);
     try {
       list = query.getResultList();
@@ -54,14 +89,13 @@ public class LogInterfaceImpl implements LogInterface {
 
     return list;
   }
-
   @Override
-  public List<Log> findAllLogs() {
+  public List<Log> findAll() {
     return logRepo.findAll();
   }
 
   @Override
-  public Log createLog(Log log) {
+  public Log save(Log log) {
     return logRepo.save(log);
   }
 
@@ -74,6 +108,20 @@ public class LogInterfaceImpl implements LogInterface {
     } catch (final ParseException pe) {
       return false;
     }
+  }
+
+  @Override
+  public Optional<Log> findById(Long id) {
+    return logRepo.findById(id);
+  }
+
+  public Boolean deleteById(Long id) {
+    try {
+      logRepo.deleteById(id);
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
   }
 
 }

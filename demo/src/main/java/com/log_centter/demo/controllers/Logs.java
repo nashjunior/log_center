@@ -7,16 +7,21 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.log_centter.demo.dto.request.LogsDTORequest;
 import com.log_centter.demo.entities.Log;
 import com.log_centter.demo.security.authentication.jwt.JwtUtils;
 import com.log_centter.demo.services.interfaces.LogInterface;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,36 +37,67 @@ public class Logs {
   LogInterface logInterface;
 
   @Autowired
+  ObjectMapper objectMapper;
+
+  @Autowired
   JwtUtils jwtIUtils;
 
   @GetMapping
   @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-  public ResponseEntity<List<?>> getAllLogs(@RequestParam Map<String, Object> reqParam){
-    System.out.println("chegou aqui");
-    reqParam.entrySet()
-        .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
-            .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true);
-
-    if (reqParam.size() > 0) {
+  public ResponseEntity<List<?>> getAllLogs(@RequestParam Map<String, Object> reqParam) {
+    if (reqParam.containsKey("page") && reqParam.containsKey("size")) {
+      reqParam.entrySet().removeIf(param -> param.getValue().toString().trim().isEmpty());
+      reqParam.entrySet().removeIf(param -> (!param.getKey().equals("page") && !param.getKey().equals("size") && Arrays.asList(Log.class.getDeclaredFields()).stream()
+      .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true)
+      );
+      
+    } else {
+      reqParam.entrySet()
+          .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
+              .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true);
+    }
+    if (!reqParam.containsKey("size") && reqParam.size() > 0) {
       final List<?> logs = logInterface.findAllLogsByParam(reqParam);
+      if(logs == null) {
+        return ResponseEntity.badRequest().build();
+      }
+      if (logs.size() > 0) {
+        return ResponseEntity.ok(logs);
+      }
+    } else if (reqParam.containsKey("size") && reqParam.size() > 2) {
+      final List<?> logs = logInterface.findAllLogsByParam(reqParam);
+      if(logs == null) {
+        return ResponseEntity.badRequest().build();
+      }
       if (logs.size() > 0) {
         return ResponseEntity.ok(logs);
       }
     }
-    return ResponseEntity.ok(logInterface.findAllLogs());
+
+    return ResponseEntity.ok(logInterface.findAll());
   }
 
   @PostMapping
-  @ResponseBody
   @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-  public ResponseEntity<Log> createLog(@Valid @RequestBody final Log newLog) {
-    Log savedLog;
-    try {
-      savedLog = logInterface.createLog(newLog);
-    } catch (final Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(savedLog);
+  @ResponseBody
+  public ResponseEntity<Log> createLog(@Valid @RequestBody final LogsDTORequest incomingLog) {
+    ModelMapper modelMapper = new ModelMapper();
+    Log newLog = modelMapper.map(incomingLog, Log.class);
+    logInterface.save(newLog);
+    return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(newLog);
   }
+
+  @DeleteMapping("/{id}")
+  @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
+  public ResponseEntity<Log> deleteLog(@PathVariable("id") Long id) {
+    return logInterface.deleteById(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+  }
+
+  public static <K, V> void printMap(Map<K, V> map) {
+    for (Map.Entry<K, V> entry : map.entrySet()) {
+        System.out.println("Key : " + entry.getKey()
+    + " Value : " + entry.getValue());
+    }
+  }
+
 }
