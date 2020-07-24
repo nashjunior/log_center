@@ -46,25 +46,29 @@ public class Logs {
   @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
   public ResponseEntity<List<?>> getAllLogs(@RequestParam Map<String, Object> reqParam) {
     if (reqParam.containsKey("page") && reqParam.containsKey("size")) {
-      reqParam.entrySet()
-          .removeIf(param -> param.getValue().toString().trim().isEmpty()
-              || ((!param.getKey().equals("page") && !param.getKey().equals("size")
-                  && Arrays.asList(Log.class.getDeclaredFields()).stream()
-                      .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList())
-                      .isEmpty() == true)));
+      reqParam.entrySet().removeIf(param -> param.getValue().toString().trim().isEmpty());
+      reqParam.entrySet().removeIf(param -> (!param.getKey().equals("page") && !param.getKey().equals("size") && Arrays.asList(Log.class.getDeclaredFields()).stream()
+      .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true)
+      );
+      
     } else {
       reqParam.entrySet()
           .removeIf(param -> param.getValue() == null || Arrays.asList(Log.class.getDeclaredFields()).stream()
               .filter(field -> field.getName().equals(param.getKey())).collect(Collectors.toList()).isEmpty() == true);
     }
-    System.out.println(reqParam.size());
     if (!reqParam.containsKey("size") && reqParam.size() > 0) {
       final List<?> logs = logInterface.findAllLogsByParam(reqParam);
+      if(logs == null) {
+        return ResponseEntity.badRequest().build();
+      }
       if (logs.size() > 0) {
         return ResponseEntity.ok(logs);
       }
     } else if (reqParam.containsKey("size") && reqParam.size() > 2) {
       final List<?> logs = logInterface.findAllLogsByParam(reqParam);
+      if(logs == null) {
+        return ResponseEntity.badRequest().build();
+      }
       if (logs.size() > 0) {
         return ResponseEntity.ok(logs);
       }
@@ -87,6 +91,13 @@ public class Logs {
   @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
   public ResponseEntity<Log> deleteLog(@PathVariable("id") Long id) {
     return logInterface.deleteById(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+  }
+
+  public static <K, V> void printMap(Map<K, V> map) {
+    for (Map.Entry<K, V> entry : map.entrySet()) {
+        System.out.println("Key : " + entry.getKey()
+    + " Value : " + entry.getValue());
+    }
   }
 
 }
