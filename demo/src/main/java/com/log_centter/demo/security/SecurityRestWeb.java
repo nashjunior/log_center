@@ -57,7 +57,7 @@ public class SecurityRestWeb extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET,"/api/auth/users/**").hasAnyAuthority("ADMIN","USER")
         .antMatchers(HttpMethod.PUT,"/api/auth/users/**").hasAuthority("USER")
         .antMatchers(HttpMethod.DELETE,"/api/auth/users/**").hasAuthority("ADMIN")
-        .antMatchers("/api/auth/**").permitAll().and().authorizeRequests().antMatchers("/api/logs/**").permitAll()
+        .antMatchers("/api/auth/**").permitAll().and().authorizeRequests().antMatchers("/api/logs/**").hasAnyAuthority("USER","ADMIN")
         .anyRequest().authenticated();
 
     httpSecurity.addFilterBefore(newfilterAuthEntryPoint(), UsernamePasswordAuthenticationFilter.class);

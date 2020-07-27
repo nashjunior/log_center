@@ -1,6 +1,6 @@
 package com.log_centter.demo.dto.response;
 
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,12 +8,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserDTOResponse {
-  @NotNull
-  private Long id;
-  @NotNull
+  public UserDTOResponse(String username, String jwt2, List<String> collect) {
+    this.email = username;
+    this.jwt = jwt2;
+    this.roles = collect;
+	}
+private Long id;
   private String email;
-  @NotNull
-  private String password;
-  @NotNull
   private String jwt;
+  private List<String> roles;
+
 }

@@ -3,10 +3,12 @@ package com.log_centter.demo.controllers;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import com.log_centter.demo.dto.request.UserDTORequest;
+import com.log_centter.demo.dto.response.UserDTOResponse;
 import com.log_centter.demo.entities.User;
 import com.log_centter.demo.repos.UserRepo;
 import com.log_centter.demo.security.authentication.jwt.JwtUtils;
@@ -15,7 +17,6 @@ import com.log_centter.demo.security.authentication.user_details.UserDetailsImpl
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,13 +48,8 @@ public class Users {
   @Autowired
   private JwtUtils jwtUtils;
 
-  @Autowired
-  private UserCache userCache;
-
-
-
   @GetMapping("/login")
-  private ResponseEntity<?> login(@Valid @RequestBody UserDTORequest user) throws NoSuchAlgorithmException {
+  private ResponseEntity<UserDTOResponse> login(@Valid @RequestBody UserDTORequest user) throws NoSuchAlgorithmException {
     Optional<User> login = userRepo.findByEmail(user.getEmail());
     if (!login.isPresent()) {
       return ResponseEntity.badRequest().build();
@@ -65,7 +61,8 @@ public class Users {
     String jwt = jwtUtils.generateJwtToken(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    return ResponseEntity.ok(jwt);
+    return ResponseEntity.ok(new UserDTOResponse(userDetails.getId(),userDetails.getUsername(), jwt, 
+      userDetails.getAuthorities().stream().map(role -> role.getAuthority()).collect(Collectors.toList())));
   }
 
   @PostMapping("/signup")
