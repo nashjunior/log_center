@@ -7,13 +7,14 @@ import java.util.Optional;
 import com.log_centter.demo.entities.Log;
 
 public interface LogInterface extends GenericInterface<Log>{
-  @Override
-  List<Log> findAll();
 
-  List<?> findAllLogsByParam(Map<String, Object> params);
+  @Override
+  List<Log> findAllList();
 
   Optional<Log> findById(Long id);
 
   Boolean deleteById(Long id);
+
+  List<?> findAllLogsByParam(Map<String, String> params, Map <String, String> ordersString , Boolean isFilter,Boolean isSized, Boolean isPageable);
 
 }

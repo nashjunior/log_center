@@ -1,4 +1,4 @@
-package com.log_centter.demo.dto;
+package com.log_centter.demo.deserializers;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

@@ -12,7 +12,9 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.log_centter.demo.dto.DateDesserializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.log_centter.demo.deserializers.DateDesserializer;
+import com.log_centter.demo.deserializers.DateSerializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,7 +36,7 @@ public class Log {
 
   @Column(name = "event_description", nullable = false)
   @NotNull
-  private String eventDescription;
+  private String description;
 
   @Column(nullable = false)
   @NotNull
@@ -42,6 +44,7 @@ public class Log {
 
   @NotNull
   @JsonDeserialize(using = DateDesserializer.class)
+  @JsonSerialize(using = DateSerializer.class)
   @Column(nullable = false)
   private LocalDateTime date;
 

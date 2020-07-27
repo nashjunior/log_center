@@ -3,12 +3,9 @@ package com.log_centter.demo.services.implementations;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -34,69 +31,81 @@ public class LogInterfaceImpl implements LogInterface {
   @Autowired
   private LogRepo logRepo;
 
+  
+
   @Override
-  public List<?> findAllLogsByParam(Map<String, Object> params) {
-    String sqlSearch = "SELECT l.* from Log l where ";
+  public List<Log> findAllList() {
+    return logRepo.findAll();
+  }
+
+  public List<?> findAllLogsByParam(final Map<String, String> params, final Map<String, String> ordersString,
+      final Boolean isFilter, final Boolean isSized, final Boolean isPageable) {
+    String sqlSearch = "SELECT l.* FROM Log l WHERE ";
     List<?> list = new ArrayList<>();
-    List<Map.Entry<String, Object>> list2= new ArrayList<>(params.entrySet());
-    
-    //Comparando as chaves e colocando o size como ultima chave
-    Collections.sort(list2, (obj1, obj2) -> {
-      if(!obj1.getKey().equals("size") && !obj1.getKey().equals("page")) return -1;
-      else if(obj1.getKey().equals("size") || obj2.getKey().equals("page")) return 1;
-
-      return 0;
-    });
-    params.clear();
-    list2.forEach(obj -> params.put(obj.getKey(), obj.getValue()));
-
-    for (Map.Entry<String, Object> param : params.entrySet()) {
-      //verifica se parametro e tipo date
-      if (param.getKey().equals("date") && isValidDate(param.getValue().toString())) {
-        sqlSearch = sqlSearch
-            .concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString() + "','DD/MM/YYYY') AND ");
-      }
-      //verifica se o parametro não e de paginacao 
-      else if (!param.getKey().equals("page") && !param.getKey().equals("size")) {
-        sqlSearch = sqlSearch.concat(param.getKey() + "='" + param.getValue().toString() + "' AND ");
-      } else if (param.getKey().equals("page") && params.containsKey("size")) {
-        sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
-        try {
-          Integer.parseInt(param.getValue().toString());
-          sqlSearch = sqlSearch.concat("OFFSET " + Integer.valueOf(param.getValue().toString()) + " ");
-        } catch (NumberFormatException | NullPointerException e) {
-          return null;
+    if (isFilter) {
+      for (final Map.Entry<String, String> param : params.entrySet()) {
+        // verifica se parametro e tipo date
+        if (param.getKey().equals("date") && isValidDate(param.getValue().toString())) {
+          sqlSearch = sqlSearch
+              .concat("date(" + param.getKey() + ")=to_date('" + param.getValue().toString() + "','DD/MM/YYYY') AND ");
+          params.remove(param.getValue());
         }
-      } else {
-        try {
-          Integer.parseInt(param.getValue().toString());
-          sqlSearch = sqlSearch.concat("LIMIT " + Integer.valueOf(param.getValue().toString()) + " ");
-        } catch (NumberFormatException | NullPointerException e) {
-          return null;
+        // verifica se o parametro não e de paginacao
+        else if (!param.getKey().equals("page") && !param.getKey().equals("size") && !param.getKey().equals("order")) {
+          sqlSearch = sqlSearch.concat(param.getKey() + "='" + param.getValue().toString() + "' AND ");
+          params.remove(param.getValue());
         }
       }
-    }
-    if (!params.containsKey("size")) {
       sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
-    }
+    } else
+      sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 7);
+
     System.out.println(sqlSearch);
-    Query query = em.createNativeQuery(sqlSearch, Log.class);
+    final Query query = em.createNativeQuery(sqlSearch, Log.class);
+    if (ordersString != null) {
+      for (final Map.Entry<String, String> param : params.entrySet()) {
+        if (param.getKey().equals("order")) {
+          sqlSearch = sqlSearch.concat(" ORDER BY ");
+          for (final Map.Entry<String, String> order : ordersString.entrySet()) {
+            query.setParameter(order.getKey(), order.getValue());
+          }
+          sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 1);
+        }
+      }
+    }
+    if (isSized)
+      query.setMaxResults(Integer.parseInt(params.get("size")));
+    if (isPageable)
+      query.setFirstResult(Integer.parseInt(params.get("page")));
+
     try {
       list = query.getResultList();
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       System.out.println(e.getMessage());
     }
 
     return list;
   }
+
   @Override
-  public List<Log> findAll() {
-    return logRepo.findAll();
+  public Log save(final Log log) {
+    log.setQuantity(logRepo.countByLevel(log.getLevel())+1);
+    return logRepo.save(log);
   }
 
   @Override
-  public Log save(Log log) {
-    return logRepo.save(log);
+  public Optional<Log> findById(final Long id) {
+    return logRepo.findById(id);
+  }
+
+  @Override
+  public Boolean deleteById(final Long id) {
+    try {
+      logRepo.deleteById(id);
+    } catch (final Exception e) {
+      return false;
+    }
+    return true;
   }
 
   public static Boolean isValidDate(final String inDate) {
@@ -108,20 +117,6 @@ public class LogInterfaceImpl implements LogInterface {
     } catch (final ParseException pe) {
       return false;
     }
-  }
-
-  @Override
-  public Optional<Log> findById(Long id) {
-    return logRepo.findById(id);
-  }
-
-  public Boolean deleteById(Long id) {
-    try {
-      logRepo.deleteById(id);
-    } catch (Exception e) {
-      return false;
-    }
-    return true;
   }
 
 }

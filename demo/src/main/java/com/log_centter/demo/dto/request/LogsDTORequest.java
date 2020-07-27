@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.log_centter.demo.dto.DateDesserializer;
+import com.log_centter.demo.deserializers.DateDesserializer;
 import com.log_centter.demo.entities.LogLevel;
 
 import lombok.AllArgsConstructor;
