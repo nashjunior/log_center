@@ -7,6 +7,7 @@ import com.log_centter.demo.security.authentication.user_details.UserDetailsServ
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -53,6 +54,9 @@ public class SecurityRestWeb extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(authEntryPoint).and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+        .antMatchers(HttpMethod.GET,"/api/auth/users/**").hasAnyAuthority("ADMIN","USER")
+        .antMatchers(HttpMethod.PUT,"/api/auth/users/**").hasAuthority("USER")
+        .antMatchers(HttpMethod.DELETE,"/api/auth/users/**").hasAuthority("ADMIN")
         .antMatchers("/api/auth/**").permitAll().and().authorizeRequests().antMatchers("/api/logs/**").permitAll()
         .anyRequest().authenticated();
 

@@ -1,6 +1,7 @@
 package com.log_centter.demo.controllers;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -11,15 +12,20 @@ import com.log_centter.demo.repos.UserRepo;
 import com.log_centter.demo.security.authentication.jwt.JwtUtils;
 import com.log_centter.demo.security.authentication.user_details.UserDetailsImpl;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +46,11 @@ public class Users {
 
   @Autowired
   private JwtUtils jwtUtils;
+
+  @Autowired
+  private UserCache userCache;
+
+
 
   @GetMapping("/login")
   private ResponseEntity<?> login(@Valid @RequestBody UserDTORequest user) throws NoSuchAlgorithmException {
@@ -65,6 +76,38 @@ public class Users {
     user.setPassword(encoder.encode(user.getPassword()));
     User newUser = userRepo.save(user.buildUser());
     return newUser == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(newUser);
+  }
+
+  @GetMapping("/users")
+  public ResponseEntity<List<User>> index(){
+    return ResponseEntity.ok(userRepo.findAll());
+  }
+
+  @PutMapping("/users/{id}")
+  public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody UserDTORequest fieldToUpdate){
+    Optional<User> user=userRepo.findById(id);
+    if(!user.isPresent()){
+      return ResponseEntity.badRequest().build();
+    }
+    ModelMapper mapper = new ModelMapper();
+    mapper.getConfiguration().setSkipNullEnabled(true);
+    if(fieldToUpdate.getPassword()!=null || fieldToUpdate.getPassword().trim().isEmpty()){
+      fieldToUpdate.setPassword(encoder.encode(fieldToUpdate.getPassword()));
+    }
+    mapper.map(fieldToUpdate,user.get());
+    userRepo.save(user.get());
+    
+    return ResponseEntity.ok().build();
+  }
+
+  @DeleteMapping("/users/{id}")
+  public ResponseEntity<User> delete(@PathVariable("id") Long id) {
+    Optional<User> user=userRepo.findById(id);
+    if(!user.isPresent()){
+      return ResponseEntity.badRequest().build();
+    }
+    userRepo.delete(user.get());
+    return ResponseEntity.ok().build();
   }
 
 }
