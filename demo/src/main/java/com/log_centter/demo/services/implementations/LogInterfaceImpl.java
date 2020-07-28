@@ -59,15 +59,18 @@ public class LogInterfaceImpl implements LogInterface {
       sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 4);
     } else
       sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 7);
-
-    System.out.println(sqlSearch);
     final Query query = em.createNativeQuery(sqlSearch, Log.class);
     if (ordersString != null) {
       for (final Map.Entry<String, String> param : params.entrySet()) {
         if (param.getKey().equals("order")) {
           sqlSearch = sqlSearch.concat(" ORDER BY ");
           for (final Map.Entry<String, String> order : ordersString.entrySet()) {
-            query.setParameter(order.getKey(), order.getValue());
+            if(order.getValue().trim().isEmpty() || order.getValue() == null) {
+              sqlSearch = sqlSearch.concat(order.getKey()+", ");
+            }
+            else {
+              sqlSearch = sqlSearch.concat(order.getKey()+" "+order.getValue()+",");
+            }
           }
           sqlSearch = sqlSearch.substring(0, sqlSearch.length() - 1);
         }

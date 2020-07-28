@@ -61,18 +61,19 @@ public class Users {
     String jwt = jwtUtils.generateJwtToken(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    return ResponseEntity.ok(new UserDTOResponse(userDetails.getId(),userDetails.getUsername(), jwt, 
+    return ResponseEntity.ok(new UserDTOResponse(userDetails.getUsername(), jwt, 
       userDetails.getAuthorities().stream().map(role -> role.getAuthority()).collect(Collectors.toList())));
   }
 
   @PostMapping("/signup")
-  private ResponseEntity<User> createUse(@Valid @RequestBody UserDTORequest user) {
+  private ResponseEntity<UserDTOResponse> createUse(@Valid @RequestBody UserDTORequest user) {
     if (userRepo.findByEmail(user.getEmail()).isPresent()) {
       return ResponseEntity.badRequest().build();
     }
     user.setPassword(encoder.encode(user.getPassword()));
     User newUser = userRepo.save(user.buildUser());
-    return newUser == null ? ResponseEntity.badRequest().build() : ResponseEntity.ok(newUser);
+    return newUser == null ? ResponseEntity.badRequest().build() 
+    : ResponseEntity.ok(new UserDTOResponse(user.getEmail(), user.getPassword(), user.getAdmin()));
   }
 
   @GetMapping("/users")
@@ -94,7 +95,7 @@ public class Users {
     mapper.map(fieldToUpdate,user.get());
     userRepo.save(user.get());
     
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok(new UserDTOResponse(user.get().getEmail(),user.get().getPassword(), user.get().getAdmin()));
   }
 
   @DeleteMapping("/users/{id}")
